@@ -28,6 +28,10 @@ module.exports = {
         allowNull: true,
         type: Sequelize.INTEGER
       },
+      handbookId: {
+        allowNull: true,
+        type: Sequelize.INTEGER
+      },
       clinicId: {
         allowNull: true,
         type: Sequelize.INTEGER

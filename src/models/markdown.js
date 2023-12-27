@@ -21,7 +21,8 @@ module.exports = (sequelize, DataTypes) => {
     description: DataTypes.TEXT('long'),
     doctorId: DataTypes.INTEGER,
     specialtyId: DataTypes.INTEGER,
-    clinicId: DataTypes.INTEGER
+    clinicId: DataTypes.INTEGER,
+    // handbookId: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Markdown',

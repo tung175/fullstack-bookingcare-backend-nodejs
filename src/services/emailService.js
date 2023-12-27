@@ -24,7 +24,7 @@ let sendSimpleEmail = async (dataSend) => {
 
 let getBodyHTMLEmail = (dataSend) => {
     let result = ''
-    if (dataSend.language === 'VI') {
+    if (dataSend.language === 'vi') {
         result = `
         <h3>Xin Chào ${dataSend.patientName}!</h3>
         <p>Bạn nhận được email này vì đã đặt lịch khám bệnh online trên trang Web BookingCare</p>
@@ -40,7 +40,7 @@ let getBodyHTMLEmail = (dataSend) => {
         <div>Xin chân thành cảm ơn</div>
         `
     }
-    if (dataSend.language === 'EN') {
+    if (dataSend.language === 'en') {
         result = `
         <h3>Hello ${dataSend.patientName}!</h3>
         <p>Bạn nhận được email này vì đã đặt lịch khám bệnh online trên trang Web BookingCare</p>
@@ -58,6 +58,62 @@ let getBodyHTMLEmail = (dataSend) => {
     }
     return result
 }
+
+let getBodyHTMLEmailRemedy = (dataSend) => {
+    let result = ''
+    if (dataSend.language === 'vi') {
+        result = `
+        <h3>Xin Chào ${dataSend.patientName}!</h3>
+        <p>Bạn nhận được email này vì đã đặt lịch khám bệnh online trên trang Web BookingCare</p>
+        <p>Thông tin đơn thuốc/hoá đơn được gửi trong file đính kèm. </p>
+
+        <div>Xin chân thành cảm ơn</div>
+        `
+    }
+    if (dataSend.language === 'en') {
+        result = `
+        <h3>Hello ${dataSend.patientName}!</h3>
+        <p>Bạn nhận được email này vì đã đặt lịch khám bệnh online trên trang Web BookingCare</p>
+        <p>Thông tin đặt lịch khám bệnh. </p>
+
+        <div>Thank you so much</div>
+        `
+    }
+    return result
+}
+
+let sendAttachment = async (dataSend) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let transporter = nodemailer.createTransport({
+                host: 'smtp.gmail.com',
+                port: 587,
+                secure: false,
+                auth: {
+                    user: process.env.EMAIL_APP,
+                    pass: process.env.EMAIL_APP_PASSWORD
+                }
+            })
+            let info = await transporter.sendMail({
+                from: '"BookingCare"<hankyusama@gmail.com>',
+                to: dataSend.email,
+                subject: "Ket qua dat lich kham benh",
+                html: getBodyHTMLEmailRemedy(dataSend),
+                attachments: [
+                    {
+                        filename: `remedy-${dataSend.patientName}-${new Date().getTime()}.png`,
+                        content: dataSend.imgBase64.split('base64,')[1],
+                        encoding: 'base64'
+                    }
+                ]
+            })
+
+            resolve(true)
+        } catch (e) {
+           reject(e) 
+        }
+    })
+}
 module.exports ={
-    sendSimpleEmail
+    sendSimpleEmail, sendAttachment
 }

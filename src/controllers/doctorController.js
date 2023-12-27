@@ -119,6 +119,39 @@ let getProfileDoctorById = async (req, res) => {
     })
   }
 }
+
+let getListPatientForDoctor = async (req, res) => {
+  try {
+    let data = await doctorService.getListPatientForDoctorService(req.query.doctorId, req.query.date)
+    // console.log("check data controller: ", req.query);
+    return res.status(200).json(
+      data
+    )
+  } catch (e) {
+    console.log(e);
+    return res.status(200).json({
+      errCode: -1,
+      errMessage: 'Error from the server'
+    })
+  }
+}
+
+let sendRemedy = async (req, res) => {
+  try {
+    let data = await doctorService.sendRemedyService(req.body)
+    // console.log("check data controller: ", req.query);
+    return res.status(200).json(
+      data
+    )
+  } catch (e) {
+    console.log(e);
+    return res.status(200).json({
+      errCode: -1,
+      errMessage: 'Error from the server'
+    })
+  }
+}
+
 module.exports = {
-  getTopDoctorHome, getAllDoctors, postInforDoctor, getDetailDoctorById, postBulkCreateSchedule, getScheduleByDate, getExtraInforDoctorById, getProfileDoctorById
+  getTopDoctorHome, getAllDoctors, postInforDoctor, getDetailDoctorById, postBulkCreateSchedule, getScheduleByDate, getExtraInforDoctorById, getProfileDoctorById, getListPatientForDoctor, sendRemedy
 };

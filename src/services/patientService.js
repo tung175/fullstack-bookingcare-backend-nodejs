@@ -3,20 +3,21 @@ require('dotenv').config()
 import emailService from "./emailService"
 import {v4 as uuidv4} from "uuid"
 
-let buildUrlEmail = () => {
-    let result = `${process.env.URL_REACT}/verify-booking?token=${token}&doctorId${doctorId}`
+let buildUrlEmail = (doctorId, token) => {
+    let result = `${process.env.URL_REACT}/verify-booking?token=${token}&doctorId=${doctorId}`
     return result
 }
+
 let postBookAppointmentService = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!data.email || !data.doctorId || !data.timeType || !data.date || !data.fullName) {
+            if (!data.email || !data.doctorId || !data.timeType || !data.date || !data.fullName || !data.selectedGender || !data.address) {
                 resolve({
-                    errCode: -1,
+                    errCode: 1,
                     errMessage: "Missing parameter!"
                 })
             } else {
-
+                // console.log("check Data:", data);
                 let token = uuidv4()
                 await emailService.sendSimpleEmail({
                     reciverEmail: data.email,
@@ -32,7 +33,10 @@ let postBookAppointmentService = (data) => {
                     where: {email: data.email},
                     defaults: {
                         email: data.email,
-                        roleId: 'R3'
+                        roleId: 'R3',
+                        gender: data.selectedGender,
+                        address: data.address,
+                        firstName: data.fullName
                     },
                 })
 
@@ -63,17 +67,22 @@ let postBookAppointmentService = (data) => {
     })
 }
 
-let postVerifyBookAppointmentService = () => {
+let postVerifyBookAppointmentService = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!data.doctorId || !data.token) {
+            // console.log("check data", data);
+            if (!data.token || !data.doctorId) {
                 resolve({
-                    errCode: -1,
+                    errCode: 1,
                     errMessage: "Missing parameter!"
                 })
             } else {
-                let user = await db.Booking.findOne({
-                    where: {email: data.email, token: data.token, statusId: 'S1'},
+                let appointment = await db.Booking.findOne({
+                    where: {
+                        doctorId: data.doctorId, 
+                        token: data.token, 
+                        statusId: 'S1'
+                    },
                     raw: false
                 })
 
@@ -85,7 +94,7 @@ let postVerifyBookAppointmentService = () => {
 
                     resolve({
                         errCode: 0,
-                        errMessage: "Save infor patient success"
+                        errMessage: "update the appointment succeed"
                     })
                 } else {
                     resolve({
